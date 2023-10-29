@@ -116,7 +116,6 @@ def userdata_2(user_id: str):
         
     total_spent = df_steam[df_steam['item_id'].isin(user_items['item_id'])]['price'].sum()
     
-
     return {
         "Usuario": user_id,
         "Dinero gastado": f"{total_spent} USD",
@@ -183,6 +182,7 @@ Vuelva a ingresar el género y verifique que sea uno de los siguientes, respetan
 
 @app.get('/UserForGenre_2/{genero}')
 def UserForGenre_2(genero: str):
+    
     genre_df = df_steam_exploded[df_steam_exploded['genres'] == genero]
 
     user_playtime = df_items.groupby('user_id').agg({'playtime_forever': 'sum'})
@@ -231,8 +231,8 @@ async def best_developer_year(anio: int):
 
 
 @app.get('/best_developer_year/{anio}')
-def best_developer_year(año: int):
-    year_df = df_steam[df_steam['release_date'].dt.year == año]
+def best_developer_year(anio: int):
+    year_df = df_steam[df_steam['release_date'].dt.year == anio]
     best_developers = df_reviews[df_reviews['item_id'].isin(year_df['item_id']) & df_reviews['recommend']].groupby('item_id').size().sort_values(ascending=False).head(3).index
     best_developers = year_df[year_df['item_id'].isin(best_developers)]['developer'].tolist()
     
