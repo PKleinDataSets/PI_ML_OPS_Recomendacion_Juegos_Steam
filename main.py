@@ -20,7 +20,7 @@ async def home():
 
 
 @app.get('/developer/{desarrollador}')
-def developer_3(desarrollador: str):
+def developer(desarrollador: str):
     desarrollador_lower = desarrollador.lower()  # Convertir el nombre del desarrollador a minúsculas
     df_steam_lower = df_steam.copy()
     df_steam_lower['developer'] = df_steam_lower['developer'].str.lower()  # Convertir los nombres de desarrolladores a minúsculas
@@ -198,7 +198,7 @@ async def best_developer_year(anio: int):
 
     return result
 
-'''
+
 @app.get('/best_developer_year_2/{anio}')
 def best_developer_year_2(anio: int):
     year_df = df_steam[df_steam['release_date'].dt.year == anio]
@@ -208,10 +208,10 @@ def best_developer_year_2(anio: int):
     best_developers = year_df[year_df['item_id'].isin(best_developers)]['developer'].tolist()
     
     return [{"Puesto {}".format(i + 1): developer} for i, developer in enumerate(best_developers)]
-'''
 
-@app.get('/developer_reviews_analysis/{desarrolladora}')
-async def developer_reviews_analysis(desarrolladora: str):
+'''
+@app.get('/developer_reviews_analysis_3/{desarrolladora}')
+async def developer_reviews_analysis_3(desarrolladora: str):
     # Hacer un merge entre df_reviews_sa y df_steam usando la columna 'item_id'
     df_merged = pd.merge(df_reviews, df_steam, on='item_id')
 
@@ -229,7 +229,8 @@ async def developer_reviews_analysis(desarrolladora: str):
     result = {desarrolladora: {'Negative': negative_count, 'Positive': positive_count}}
 
     return result
-
+'''
+'''
 @app.get('/developer_reviews_analysis_2/{desarrolladora}')
 def developer_reviews_analysis_2(desarrolladora: str):
     developer_items = df_steam[df_steam['developer'] == desarrolladora]['item_id']
@@ -239,10 +240,10 @@ def developer_reviews_analysis_2(desarrolladora: str):
     negative_reviews = developer_reviews[developer_reviews['sentiment_analysis'] == 1].shape[0]
     
     return {desarrolladora: {'Positive': positive_reviews, 'Negative': negative_reviews}}
+'''
 
-
-@app.get('/developer_reviews_analysis_3/{desarrolladora}')
-async def developer_reviews_analysis_3(desarrolladora: str):
+@app.get('/developer_reviews_analysis/{desarrolladora}')
+async def developer_reviews_analysis(desarrolladora: str):
     desarrolladora_lower = desarrolladora.lower()
     df_steam_lower = df_steam.copy()
     df_steam_lower['developer'] = df_steam_lower['developer'].str.lower()
