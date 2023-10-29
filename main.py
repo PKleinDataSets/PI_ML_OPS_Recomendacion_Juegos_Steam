@@ -294,8 +294,9 @@ async def developer_reviews_analysis_3(desarrolladora: str):
 
     # Crear el diccionario de retorno
     result = {desarrolladora: {'Negative': negative_count, 'Positive': positive_count}}
-
     return result
+    
+----------------------------------------------------------------------------------------------    
 @app.get('/developer_reviews_analysis_2/{desarrolladora}')
 def developer_reviews_analysis_2(desarrolladora: str):
     developer_items = df_steam[df_steam['developer'] == desarrolladora]['item_id']
