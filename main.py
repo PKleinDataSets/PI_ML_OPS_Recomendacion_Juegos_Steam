@@ -241,6 +241,30 @@ def developer_reviews_analysis_2(desarrolladora: str):
     return {desarrolladora: {'Positive': positive_reviews, 'Negative': negative_reviews}}
 
 
+@app.get('/developer_reviews_analysis_3/{desarrolladora}')
+async def developer_reviews_analysis_3(desarrolladora: str):
+    desarrolladora_lower = desarrolladora.lower()
+    df_steam_lower = df_steam.copy()
+    df_steam_lower['developer'] = df_steam_lower['developer'].str.lower()
+
+    # Hacer un merge entre df_reviews_sa y df_steam usando la columna 'item_id'
+    df_merged = pd.merge(df_reviews, df_steam_lower, on='item_id')
+
+    # Filtrar los juegos desarrollados por la desarrolladora dada
+    df_filtered = df_merged[df_merged['developer'] == desarrolladora_lower]
+
+    # Filtrar las reseñas con análisis de sentimiento positivo o negativo
+    df_filtered = df_filtered[df_filtered['sentiment_analysis'].isin([0, 2])]
+
+    # Contar la cantidad de reseñas negativas y positivas
+    negative_count = df_filtered[df_filtered['sentiment_analysis'] == 0].shape[0]
+    positive_count = df_filtered[df_filtered['sentiment_analysis'] == 2].shape[0]
+
+    # Crear el diccionario de retorno
+    result = {desarrolladora: {'Negative': negative_count, 'Positive': positive_count}}
+
+    return result
+
 
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -276,79 +300,5 @@ async def recomendacion_usuario(user_id):
     return recommended_items.index.tolist()[:5]
 
 
-@app.get('/best_developer_year_3/{anio}')
-async def best_developer_year_3(anio: int):
-    # Convertir la columna 'posted' a tipo datetime
-    df_reviews['posted'] = pd.to_datetime(df_reviews['posted'], errors='coerce')
-
-    # Filtrar los dataframes para el año especificado
-    reviews_year = df_reviews[df_reviews['posted'].dt.year == anio]
-    steam_year = df_steam[df_steam['release_date'].dt.year == anio]
-
-    # Filtrar las reseñas para quedarse solo con las recomendadas
-    reviews_recommended = reviews_year[(reviews_year['recommend'] == True)\
-        & (reviews_year['sentiment_analysis'] >= 1)]
-
-    # Realizar un merge para combinar la información de las reseñas y juegos
-    merged = reviews_recommended.merge(steam_year, on='item_id')
-
-    # Agrupar por desarrollador y contar el número de reseñas recomendadas
-    developer_count = merged.groupby('developer')['recommend'].count()
-
-    # Ordenar los desarrolladores por el número de reseñas recomendadas de forma descendente
-    sorted_developers = developer_count.sort_values(ascending=False)
-
-    # Seleccionar los primeros tres desarrolladores
-    top_3_developers = sorted_developers.head(3)
-
-    # Crear el resultado en el formato especificado
-    result = {str(anio): top_3_developers.to_dict()}
-
-    return result
-
-@app.get('/developer_reviews_analysis_3/{desarrolladora}')
-async def developer_reviews_analysis_3(desarrolladora: str):
-    desarrolladora_lower = desarrolladora.lower()
-    df_steam_lower = df_steam.copy()
-    df_steam_lower['developer'] = df_steam_lower['developer'].str.lower()
-
-    # Hacer un merge entre df_reviews_sa y df_steam usando la columna 'item_id'
-    df_merged = pd.merge(df_reviews, df_steam_lower, on='item_id')
-
-    # Filtrar los juegos desarrollados por la desarrolladora dada
-    df_filtered = df_merged[df_merged['developer'] == desarrolladora_lower]
-
-    # Filtrar las reseñas con análisis de sentimiento positivo o negativo
-    df_filtered = df_filtered[df_filtered['sentiment_analysis'].isin([0, 2])]
-
-    # Contar la cantidad de reseñas negativas y positivas
-    negative_count = df_filtered[df_filtered['sentiment_analysis'] == 0].shape[0]
-    positive_count = df_filtered[df_filtered['sentiment_analysis'] == 2].shape[0]
-
-    # Crear el diccionario de retorno
-    result = {desarrolladora: {'Negative': negative_count, 'Positive': positive_count}}
-
-    return result
-
-@app.get('/recomendacion_usuario_3/{user_id}')
-async def recomendacion_usuario_3(user_id):
-
-    if user_id.lower() not in df_reviews_shuffled['user_id'].str.lower().unique():
-        return 'El usuario no está en la base de datos'
-    # Obtener la fila correspondiente al usuario ingresado
-    user_vector = user_item_matrix.loc[user_id].values.reshape(1, -1)
-
-    # Calcular la similitud entre el usuario ingresado y todos los demás usuarios
-    similarities = cosine_similarity(user_vector, user_item_matrix)
-
-    # Obtener los juegos que los usuarios similares a 'user_id' han disfrutado
-    user_reviews = user_item_matrix.loc[user_id]
-    similar_users = user_item_matrix.index[similarities.argsort()[0][-6:-1]]
-    recommended_items = user_item_matrix.loc[similar_users].mean(axis=0).sort_values(ascending=False)
-
-    # Filtrar los juegos que el usuario ya ha jugado
-    recommended_items = recommended_items[~recommended_items.index.isin(user_reviews[user_reviews > 0].index)]
-
-    return recommended_items.index.tolist()[:5]
 
 
