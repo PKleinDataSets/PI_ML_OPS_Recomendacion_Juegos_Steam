@@ -137,9 +137,12 @@ Vuelva a ingresar el género y verifique que sea uno de los siguientes, respetan
 
 @app.get('/best_developer_year/{anio}')
 async def best_developer_year(anio: int):
+    # Convertir la columna 'posted' a tipo datetime
+    df_reviews['posted'] = pd.to_datetime(df_reviews['posted'], errors='coerce')
+
     # Filtrar los dataframes para el año especificado
-    reviews_year = df_reviews[df_reviews['year_posted'] == str(anio)]
-    steam_year = df_steam[df_steam['year'] == str(anio)]
+    reviews_year = df_reviews[df_reviews['posted'].dt.year == anio]
+    steam_year = df_steam[df_steam['release_date'].dt.year == anio]
 
     # Filtrar las reseñas para quedarse solo con las recomendadas
     reviews_recommended = reviews_year[reviews_year['recommend'] == True]
@@ -160,6 +163,7 @@ async def best_developer_year(anio: int):
     result = {str(anio): top_3_developers.to_dict()}
 
     return result
+
 
 
 @app.get('/developer_reviews_analysis/{desarrolladora}')
