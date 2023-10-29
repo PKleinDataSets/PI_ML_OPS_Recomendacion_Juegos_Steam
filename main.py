@@ -209,38 +209,6 @@ def best_developer_year_2(anio: int):
     
     return [{"Puesto {}".format(i + 1): developer} for i, developer in enumerate(best_developers)]
 
-'''
-@app.get('/developer_reviews_analysis_3/{desarrolladora}')
-async def developer_reviews_analysis_3(desarrolladora: str):
-    # Hacer un merge entre df_reviews_sa y df_steam usando la columna 'item_id'
-    df_merged = pd.merge(df_reviews, df_steam, on='item_id')
-
-    # Filtrar los juegos desarrollados por la desarrolladora dada
-    df_filtered = df_merged[df_merged['developer'] == desarrolladora]
-
-    # Filtrar las reseñas con análisis de sentimiento positivo o negativo
-    df_filtered = df_filtered[df_filtered['sentiment_analysis'].isin([0, 2])]
-
-    # Contar la cantidad de reseñas negativas y positivas
-    negative_count = df_filtered[df_filtered['sentiment_analysis'] == 0].shape[0]
-    positive_count = df_filtered[df_filtered['sentiment_analysis'] == 2].shape[0]
-
-    # Crear el diccionario de retorno
-    result = {desarrolladora: {'Negative': negative_count, 'Positive': positive_count}}
-
-    return result
-'''
-'''
-@app.get('/developer_reviews_analysis_2/{desarrolladora}')
-def developer_reviews_analysis_2(desarrolladora: str):
-    developer_items = df_steam[df_steam['developer'] == desarrolladora]['item_id']
-    developer_reviews = df_reviews[df_reviews['item_id'].isin(developer_items)]
-    
-    positive_reviews = developer_reviews[developer_reviews['sentiment_analysis'] == 2].shape[0]
-    negative_reviews = developer_reviews[developer_reviews['sentiment_analysis'] == 1].shape[0]
-    
-    return {desarrolladora: {'Positive': positive_reviews, 'Negative': negative_reviews}}
-'''
 
 @app.get('/developer_reviews_analysis/{desarrolladora}')
 async def developer_reviews_analysis(desarrolladora: str):
@@ -299,6 +267,47 @@ async def recomendacion_usuario(user_id):
     recommended_items = recommended_items[~recommended_items.index.isin(user_reviews[user_reviews > 0].index)]
 
     return recommended_items.index.tolist()[:5]
+
+
+
+
+
+
+
+
+'''
+------------------------------------------------------------------------------------------
+@app.get('/developer_reviews_analysis_3/{desarrolladora}')
+async def developer_reviews_analysis_3(desarrolladora: str):
+    # Hacer un merge entre df_reviews_sa y df_steam usando la columna 'item_id'
+    df_merged = pd.merge(df_reviews, df_steam, on='item_id')
+
+    # Filtrar los juegos desarrollados por la desarrolladora dada
+    df_filtered = df_merged[df_merged['developer'] == desarrolladora]
+
+    # Filtrar las reseñas con análisis de sentimiento positivo o negativo
+    df_filtered = df_filtered[df_filtered['sentiment_analysis'].isin([0, 2])]
+
+    # Contar la cantidad de reseñas negativas y positivas
+    negative_count = df_filtered[df_filtered['sentiment_analysis'] == 0].shape[0]
+    positive_count = df_filtered[df_filtered['sentiment_analysis'] == 2].shape[0]
+
+    # Crear el diccionario de retorno
+    result = {desarrolladora: {'Negative': negative_count, 'Positive': positive_count}}
+
+    return result
+@app.get('/developer_reviews_analysis_2/{desarrolladora}')
+def developer_reviews_analysis_2(desarrolladora: str):
+    developer_items = df_steam[df_steam['developer'] == desarrolladora]['item_id']
+    developer_reviews = df_reviews[df_reviews['item_id'].isin(developer_items)]
+    
+    positive_reviews = developer_reviews[developer_reviews['sentiment_analysis'] == 2].shape[0]
+    negative_reviews = developer_reviews[developer_reviews['sentiment_analysis'] == 1].shape[0]
+    
+    return {desarrolladora: {'Positive': positive_reviews, 'Negative': negative_reviews}}
+-------------------------------------------------------------------------------------------------    
+'''
+
 
 
 
