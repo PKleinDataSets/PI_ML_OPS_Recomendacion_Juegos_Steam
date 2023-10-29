@@ -113,7 +113,7 @@ def userdata_2(user_id: str):
     user_reviews = df_reviews[df_reviews['user_id'] == user_id]
 
     total_spent = df_steam[df_steam['item_id'].isin(user_items['item_id'])]['price'].sum()
-    recommend_percentage = (user_reviews['recommend'].mean() * 100).round(1)
+    recommend_percentage = round((user_reviews['recommend'].mean() * 100), 1)
 
     return {
         "Usuario": user_id,
