@@ -121,7 +121,7 @@ En este archivo encontrarás la implementación de FastAPI y el desarrollo de la
 
 # **Link a la API y instrucciones:**
 
-+ [Deployment](https://app1-rizi.onrender.com/docs): El proyecto ha sido desplegado en un entorno en línea utilizando **Render**
++ [Deployment](https://app2-dho4.onrender.com/docs#/): El proyecto ha sido desplegado en un entorno en línea utilizando **Render**
 
 :warning: **Sintaxis a tener en cuenta al escribir una consulta:** :warning:
 
@@ -167,7 +167,7 @@ y el resto de caracteres. Ejemplo : barbas1, Z1_M4N, bobseagull.
 
 + [Video explicativo](https://youtu.be/RUVuZAiKzg0) Un video Youtube explicando algunos conceptos sobre el proyecto, y mostrando el deployment de la API en Render.
 
-+ [API]([link](https://app2-dho4.onrender.com/docs))  API del proyecto.
++ [API](https://app2-dho4.onrender.com/docs#/)  API del proyecto.
 
 :fire: [Gmail](pablodatasets@gmail.com) : pablodatasets@gmail.com Mail de contacto
 
