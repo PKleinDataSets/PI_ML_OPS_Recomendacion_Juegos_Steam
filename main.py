@@ -54,6 +54,19 @@ async def developer(desarrollador: str):
 
     return {desarrollador: result}
 
+@app.get('/developer_2/{desarrollador}')
+def developer_2(desarrollador: str):
+    filtered_steam = df_steam[df_steam['developer'] == desarrollador]
+    filtered_steam_exploded = df_steam_exploded[df_steam_exploded['developer'] == desarrollador]
+    filtered_steam['release_date'] = pd.to_datetime(filtered_steam['release_date'])
+    filtered_steam['year'] = filtered_steam['release_date'].dt.year
+
+    grouped = filtered_steam.groupby('year').agg(
+        {'item_id': 'count', 'price': lambda x: sum(x == 0) / len(x)}
+    ).rename(columns={'item_id': 'Cantidad de Items', 'price': 'Contenido Free'})
+    grouped['Contenido Free'] = (grouped['Contenido Free'] * 100).round(1).astype(str) + '%'
+    
+    return grouped.to_dict()
 
 
 @app.get('/userdata/{User_id}')
@@ -85,6 +98,23 @@ async def userdata(User_id: str):
     item_count = len(item_ids)
 
     return {"Usuario": User_id, "Dinero gastado": f"{money_spent} USD", "% de recomendación": f"{recommendation_percentage}%", "cantidad de items": item_count}
+
+
+@app.get('/userdata_2/{User_id}')
+def userdata(user_id: str):
+    user_items = df_items[df_items['user_id'] == user_id]
+    user_reviews = df_reviews[df_reviews['user_id'] == user_id]
+
+    total_spent = df_steam[df_steam['item_id'].isin(user_items['item_id'])]['price'].sum()
+    recommend_percentage = (user_reviews['recommend'].mean() * 100).round(1)
+
+    return {
+        "Usuario": user_id,
+        "Dinero gastado": f"{total_spent} USD",
+        "% de recomendación": f"{recommend_percentage}%",
+        "cantidad de items": len(user_items)
+    }
+
 
 
 @app.get('/UserForGenre/{genero}')
@@ -142,6 +172,23 @@ Vuelva a ingresar el género y verifique que sea uno de los siguientes, respetan
 
     return {"Usuario con más horas jugadas para el género " + genero: max_playtime_user, "Horas jugadas por año": horas_por_anio}
 
+@app.get('/UserForGenre_2/{genero}')
+def UserForGenre_2(genero: str):
+    genre_df = df_steam_exploded[df_steam_exploded['genres'] == genero]
+
+    user_playtime = df_items.groupby('user_id').agg({'playtime_forever': 'sum'})
+    genre_playtime = user_playtime.join(df_items[df_items['item_id'].isin(genre_df['item_id'])].groupby('user_id').agg({'playtime_forever': 'sum'}), rsuffix='_genre')
+
+    most_played_user = genre_playtime['playtime_forever_genre'].idxmax()
+    hours_by_year = df_items[df_items['item_id'].isin(genre_df['item_id'])].merge(df_steam, on='item_id')
+    hours_by_year = hours_by_year.groupby(hours_by_year['release_date'].dt.year).agg({'playtime_forever': 'sum'}).reset_index()
+
+    return {
+        "Usuario con más horas jugadas para Género {}".format(genero): most_played_user,
+        "Horas jugadas": [{'Año': year, 'Horas': hours} for year, hours in zip(hours_by_year['release_date'], hours_by_year['playtime_forever'])]
+    }
+
+
 
 @app.get('/best_developer_year/{anio}')
 async def best_developer_year(anio: int):
@@ -153,7 +200,8 @@ async def best_developer_year(anio: int):
     steam_year = df_steam[df_steam['release_date'].dt.year == anio]
 
     # Filtrar las reseñas para quedarse solo con las recomendadas
-    reviews_recommended = reviews_year[reviews_year['recommend'] == True]
+    reviews_recommended = reviews_year[(reviews_year['recommend'] == True)\
+        & (reviews_year['sentiment_analysis'] >= 1)]
 
     # Realizar un merge para combinar la información de las reseñas y juegos
     merged = reviews_recommended.merge(steam_year, on='item_id')
@@ -173,26 +221,13 @@ async def best_developer_year(anio: int):
     return result
 
 
-
-@app.get('/developer_reviews_analysis/{desarrolladora}')
-async def developer_reviews_analysis(desarrolladora: str):
-    # Hacer un merge entre df_reviews_sa y df_steam usando la columna 'item_id'
-    df_merged = pd.merge(df_reviews, df_steam, on='item_id')
-
-    # Filtrar los juegos desarrollados por la desarrolladora dada
-    df_filtered = df_merged[df_merged['developer'] == desarrolladora]
-
-    # Filtrar las reseñas con análisis de sentimiento positivo o negativo
-    df_filtered = df_filtered[df_filtered['sentiment_analysis'].isin([0, 2])]
-
-    # Contar la cantidad de reseñas negativas y positivas
-    negative_count = df_filtered[df_filtered['sentiment_analysis'] == 0].shape[0]
-    positive_count = df_filtered[df_filtered['sentiment_analysis'] == 2].shape[0]
-
-    # Crear el diccionario de retorno
-    result = {desarrolladora: {'Negative': negative_count, 'Positive': positive_count}}
-
-    return result
+@app.get('/best_developer_year/{anio}')
+def best_developer_year(año: int):
+    year_df = df_steam[df_steam['release_date'].dt.year == año]
+    best_developers = df_reviews[df_reviews['item_id'].isin(year_df['item_id']) & df_reviews['recommend']].groupby('item_id').size().sort_values(ascending=False).head(3).index
+    best_developers = year_df[year_df['item_id'].isin(best_developers)]['developer'].tolist()
+    
+    return [{"Puesto {}".format(i + 1): developer} for i, developer in enumerate(best_developers)]
 
 
 @app.get('/developer_reviews_analysis/{desarrolladora}')
@@ -214,6 +249,18 @@ async def developer_reviews_analysis(desarrolladora: str):
     result = {desarrolladora: {'Negative': negative_count, 'Positive': positive_count}}
 
     return result
+
+@app.get('/developer_reviews_analysis_2/{desarrolladora}')
+def developer_reviews_analysis_2(desarrolladora: str):
+    developer_items = df_steam[df_steam['developer'] == desarrolladora]['item_id']
+    developer_reviews = df_reviews[df_reviews['item_id'].isin(developer_items)]
+    
+    positive_reviews = developer_reviews[developer_reviews['sentiment_analysis'] == 2].shape[0]
+    negative_reviews = developer_reviews[developer_reviews['sentiment_analysis'] == 1].shape[0]
+    
+    return {desarrolladora: {'Positive': positive_reviews, 'Negative': negative_reviews}}
+
+
 
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -229,6 +276,9 @@ user_similarity = cosine_similarity(user_item_matrix)
 
 @app.get('/recomendacion_usuario/{user_id}')
 async def recomendacion_usuario(user_id):
+    
+    if user_id not in df_reviews_shuffled['user_id']:
+        return 'El usuario no está en la base de datos'
     # Obtener la fila correspondiente al usuario ingresado
     user_vector = user_item_matrix.loc[user_id].values.reshape(1, -1)
 
