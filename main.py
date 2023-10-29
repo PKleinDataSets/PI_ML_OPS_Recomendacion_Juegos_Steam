@@ -105,15 +105,17 @@ def userdata_2(user_id: str):
     
     if user_id not in df_items['user_id']:
         return 'El usuario no está en los datos'
-    
-    if user_id not in df_reviews['user_id']:
-        return 'El usuario no realizó recomendaciones' 
        
     user_items = df_items[df_items['user_id'] == user_id]
     user_reviews = df_reviews[df_reviews['user_id'] == user_id]
-
+    
+    if user_id not in df_reviews['user_id']:
+        recommend_percentage = 0.0
+    else :
+        recommend_percentage = round((user_reviews['recommend'].mean() * 100), 1)    
+        
     total_spent = df_steam[df_steam['item_id'].isin(user_items['item_id'])]['price'].sum()
-    recommend_percentage = round((user_reviews['recommend'].mean() * 100), 1)
+    
 
     return {
         "Usuario": user_id,
