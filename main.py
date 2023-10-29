@@ -18,41 +18,6 @@ df_steam['release_date'] = pd.to_datetime(df_reviews['posted'])
 async def home():
     return {'Data' : 'Testing'}
 
-@app.get('/developer/{desarrollador}')
-async def developer(desarrollador: str):
-    # Convertir el nombre del desarrollador proporcionado a minúsculas
-    desarrollador_lower = desarrollador.lower()
-
-    # Convertir la columna 'release_date' a tipo datetime
-    df_steam['release_date'] = pd.to_datetime(df_steam['release_date'], errors='coerce')
-
-    # Filtrar los dataframes para el desarrollador proporcionado
-    # Convertir la columna 'developer' a minúsculas antes de la comparación
-    developer_games = df_steam[df_steam['developer'].str.lower() == desarrollador_lower]
-
-    # Si el desarrollador no tiene juegos en el dataframe
-    if developer_games.empty:
-        return 'El desarrollador no tiene juegos en la plataforma'
-
-    # Obtener los años únicos de los juegos del desarrollador
-    years = developer_games['release_date'].dt.year.unique()
-
-    result = {}
-
-    for year in years:
-        # Filtrar los juegos del desarrollador para el año especificado
-        developer_games_year = developer_games[developer_games['release_date'].dt.year == year]
-
-        # Contar la cantidad de items
-        item_count = len(developer_games_year)
-
-        # Calcular el porcentaje de contenido gratuito
-        free_games = developer_games_year[developer_games_year['price'] == 0]
-        free_percentage = (len(free_games) / item_count) * 100
-
-        result[year] = {'Cantidad de Items': item_count, 'Contenido Free': f'{free_percentage}%'}
-
-    return {desarrollador: result}
 
 @app.get('/developer_2/{desarrollador}')
 def developer_2(desarrollador: str):
@@ -67,6 +32,25 @@ def developer_2(desarrollador: str):
     grouped['Contenido Free'] = (grouped['Contenido Free'] * 100).round(1).astype(str) + '%'
     
     return grouped.to_dict()
+
+@app.get('/developer_3/{desarrollador}')
+def developer_3(desarrollador: str):
+    desarrollador_lower = desarrollador.lower()  # Convertir el nombre del desarrollador a minúsculas
+    df_steam_lower = df_steam.copy()
+    df_steam_lower['developer'] = df_steam_lower['developer'].str.lower()  # Convertir los nombres de desarrolladores a minúsculas
+
+    filtered_steam = df_steam_lower[df_steam_lower['developer'] == desarrollador_lower]
+    filtered_steam_exploded = df_steam_exploded[df_steam_exploded['developer'].str.lower() == desarrollador_lower]
+    filtered_steam['release_date'] = pd.to_datetime(filtered_steam['release_date'])
+    filtered_steam['year'] = filtered_steam['release_date'].dt.year
+
+    grouped = filtered_steam.groupby('year').agg(
+        {'item_id': 'count', 'price': lambda x: sum(x == 0) / len(x)}
+    ).rename(columns={'item_id': 'Cantidad de Items', 'price': 'Contenido Free'})
+    grouped['Contenido Free'] = (grouped['Contenido Free'] * 100).round(1).astype(str) + '%'
+    
+    return grouped.to_dict()
+
 
 
 @app.get('/userdata/{User_id}')
@@ -103,9 +87,6 @@ async def userdata(User_id: str):
 @app.get('/userdata_2/{User_id}')
 def userdata_2(user_id: str):
     
-    if user_id not in df_items['user_id']:
-        return 'El usuario no está en los datos'
-       
     user_items = df_items[df_items['user_id'] == user_id]
     user_reviews = df_reviews[df_reviews['user_id'] == user_id]
     
@@ -230,8 +211,8 @@ async def best_developer_year(anio: int):
     return result
 
 
-@app.get('/best_developer_year/{anio}')
-def best_developer_year(anio: int):
+@app.get('/best_developer_year_2/{anio}')
+def best_developer_year_2(anio: int):
     year_df = df_steam[df_steam['release_date'].dt.year == anio]
     best_developers = df_reviews[df_reviews['item_id'].isin(year_df['item_id']) &\
         df_reviews['recommend'] & df_reviews['sentiment_analysis'] > 0]\
@@ -288,7 +269,7 @@ user_similarity = cosine_similarity(user_item_matrix)
 @app.get('/recomendacion_usuario/{user_id}')
 async def recomendacion_usuario(user_id):
     
-    if user_id not in df_reviews_shuffled['user_id']:
+    if  df_reviews_shuffled[df_reviews_shuffled['user_id'] == user_id].shape[0] == 0:
         return 'El usuario no está en la base de datos'
     # Obtener la fila correspondiente al usuario ingresado
     user_vector = user_item_matrix.loc[user_id].values.reshape(1, -1)
