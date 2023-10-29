@@ -77,31 +77,40 @@ Se han definido 6 funciones para los endpoints que serán consumidos en la API, 
 
 ### A continuación, se detallan las funciones y las consultas que pueden realizarse a través de la API:
 
-1. + def **PlayTimeGenre( *`genero` : str* )**:
-    + Debe devolver `año` con mas horas jugadas para dicho género.
-  
-Ejemplo de retorno: {"Año con más horas jugadas para Género X" : 2013}
 
-2. + def **UserForGenre( *`genero` : str* )**:
-    + Debe devolver el usuario que acumula más horas jugadas para el género dado y una lista de la acumulación de horas jugadas por año.
+1. + def **developer( *`desarrollador` : str* )**:
+    `Cantidad` de items y `porcentaje` de contenido Free por año según empresa desarrolladora. 
+Ejemplo de retorno:
+
+| Año  | Cantidad de Items | Contenido Free  |
+|------|-------------------|------------------|
+| 2023 | 50                | 27%              |
+| 2022 | 45                | 25%              |
+| xxxx | xx                | xx%              |
+
+
+2. + def **userdata( *`User_id` : str* )**:
+    Debe devolver `cantidad` de dinero gastado por el usuario, el `porcentaje` de recomendación en base a reviews.recommend y `cantidad de items`.
+
+Ejemplo de retorno: {"Usuario X" : us213ndjss09sdf, "Dinero gastado": 200 USD, "% de recomendación": 20%, "cantidad de items": 5}
+
+3. + def **UserForGenre( *`genero` : str* )**:
+    Debe devolver el usuario que acumula más horas jugadas para el género dado y una lista de la acumulación de horas jugadas por año de lanzamiento.
 
 Ejemplo de retorno: {"Usuario con más horas jugadas para Género X" : us213ndjss09sdf,
 			     "Horas jugadas":[{Año: 2013, Horas: 203}, {Año: 2012, Horas: 100}, {Año: 2011, Horas: 23}]}
-
-3. + def **UsersRecommend( *`año` : int* )**:
-   + Devuelve el top 3 de juegos MÁS recomendados por usuarios para el año dado. (reviews.  recommend = True y comentarios positivos/neutrales)
+	
+4. + def **best_developer_year( *`año` : int* )**:
+   Devuelve el top 3 de desarrolladores con juegos MÁS recomendados por usuarios para el año dado. (reviews.recommend = True y comentarios positivos)
   
 Ejemplo de retorno: [{"Puesto 1" : X}, {"Puesto 2" : Y},{"Puesto 3" : Z}]
 
-4. + def **UsersNotRecommend( *`año` : int* )**:
-   + Devuelve el top 3 de juegos MENOS recomendados por usuarios para el año dado. (reviews.   recommend = False y comentarios negativos)
-  
-Ejemplo de retorno: [{"Puesto 1" : X}, {"Puesto 2" : Y},{"Puesto 3" : Z}]
+5. + def **developer_reviews_analysis( *`desarrolladora` : str* )**:
+    Según el desarrollador, se devuelve un diccionario con el nombre del desarrollador como llave y una lista con la cantidad total 
+    de registros de reseñas de usuarios que se encuentren categorizados con un análisis de sentimiento como valor positivo o negativo. 
 
-5. + def **sentiment_analysis( *`año` : int* )**:
-    Según el año de lanzamiento, se devuelve una lista con la cantidad de registros de reseñas de usuarios que se encuentren categorizados con un análisis de sentimiento. 
+Ejemplo de retorno: {'Valve' : [Negative = 182, Positive = 278]}
 
-    + Ejemplo de retorno: {Negative = 182, Neutral = 120, Positive = 278}
 
 6. + Sistema de recomendación user-item:
     + def **recomendacion_usuario( *`id de usuario`* )**:
@@ -125,7 +134,7 @@ en minuscula  y sin comillas , ejemplo : Action, Simulation, Strategy.
 :red_circle: el user_id debe ser escrito de forma exacta respetando mayúsculas, minúsculas
 y el resto de caracteres. Ejemplo : barbas1, Z1_M4N, bobseagull.
 
-:link: En este [link](https://app1-rizi.onrender.com/docs) podras ingresar y consultar las funciones. Cliqueando en GET de cada función, luego la opción 'Try it out', colocar los el dato correspondiente, y cliquear botón 'Execute'.
+:link: En este [link](https://app2-dho4.onrender.com/docs) podras ingresar y consultar las funciones. Cliqueando en GET de cada función, luego la opción 'Try it out', colocar los el dato correspondiente, y cliquear botón 'Execute'.
 
 
 -------------------------------------------------------------------------------------
@@ -157,6 +166,8 @@ y el resto de caracteres. Ejemplo : barbas1, Z1_M4N, bobseagull.
 + [Diccionario de datos](https://docs.google.com/spreadsheets/d/1-t9HLzLHIGXvliq56UE_gMaWBVTPfrlTf2D9uAtLGrk/edit?usp=drive_web&ouid=108742311118546721132): Diccionario con algunas descripciones de las columnas disponibles en el dataset.
 
 + [Video explicativo](https://youtu.be/RUVuZAiKzg0) Un video Youtube explicando algunos conceptos sobre el proyecto, y mostrando el deployment de la API en Render.
+
++ [API]([link](https://app2-dho4.onrender.com/docs))  API del proyecto.
 
 :fire: [Gmail](pablodatasets@gmail.com) : pablodatasets@gmail.com Mail de contacto
 

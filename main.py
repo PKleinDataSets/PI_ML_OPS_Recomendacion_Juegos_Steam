@@ -198,7 +198,6 @@ async def best_developer_year(anio: int):
 
     return result
 
-
 @app.get('/best_developer_year_2/{anio}')
 def best_developer_year_2(anio: int):
     year_df = df_steam[df_steam['release_date'].dt.year == anio]
@@ -271,10 +270,6 @@ async def recomendacion_usuario(user_id):
 
 
 
-
-
-
-
 '''
 ------------------------------------------------------------------------------------------
 
@@ -297,7 +292,7 @@ async def developer_reviews_analysis_3(desarrolladora: str):
     return result
     
 ----------------------------------------------------------------------------------------------    
-
+@app.get('/developer_reviews_analysis_2/{desarrolladora}')
 def developer_reviews_analysis_2(desarrolladora: str):
     developer_items = df_steam[df_steam['developer'] == desarrolladora]['item_id']
     developer_reviews = df_reviews[df_reviews['item_id'].isin(developer_items)]
