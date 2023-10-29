@@ -9,6 +9,9 @@ df_reviews = pd.read_csv('Datasets/reviews_sa.csv')
 df_steam_exploded = pd.read_csv('Datasets/steam_exploded.csv')
 df_steam= pd.read_csv('Datasets/steam_games.csv')
 
+df_reviews['posted'] = pd.to_datetime(df_reviews['posted'], format='%d-%m-%Y')
+df_steam_exploded['release_date'] = pd.to_datetime(df_reviews['posted'])
+df_steam['release_date'] = pd.to_datetime(df_reviews['posted'])
 
 
 @app.get('/')
