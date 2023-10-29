@@ -277,7 +277,7 @@ async def recomendacion_usuario(user_id):
 
 '''
 ------------------------------------------------------------------------------------------
-@app.get('/developer_reviews_analysis_3/{desarrolladora}')
+
 async def developer_reviews_analysis_3(desarrolladora: str):
     # Hacer un merge entre df_reviews_sa y df_steam usando la columna 'item_id'
     df_merged = pd.merge(df_reviews, df_steam, on='item_id')
@@ -297,7 +297,7 @@ async def developer_reviews_analysis_3(desarrolladora: str):
     return result
     
 ----------------------------------------------------------------------------------------------    
-@app.get('/developer_reviews_analysis_2/{desarrolladora}')
+
 def developer_reviews_analysis_2(desarrolladora: str):
     developer_items = df_steam[df_steam['developer'] == desarrolladora]['item_id']
     developer_reviews = df_reviews[df_reviews['item_id'].isin(developer_items)]
