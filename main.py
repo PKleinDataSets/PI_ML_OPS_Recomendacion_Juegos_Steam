@@ -161,34 +161,8 @@ async def best_developer_year(anio: int):
 
     return result
 
-@app.get('/developer_reviews_analysis/{desarrolladora}')
-async def developer_reviews_analysis(desarrolladora: str):
-    # Convertir el nombre del desarrollador a minúsculas para comparación insensible a mayúsculas/minúsculas
-    desarrolladora_lower = desarrolladora.lower()
 
-    # Filtrar el dataframe df_steam para obtener los juegos del desarrollador especificado
-    # Convertir la columna 'developer' a minúsculas antes de la comparación
-    games_developer = df_steam[df_steam['developer'].str.lower() == desarrolladora_lower]
-
-    # Obtener los item_id de los juegos del desarrollador
-    item_ids = games_developer['item_id']
-
-    # Filtrar el dataframe df_reviews_sa para obtener las reseñas de los juegos del desarrollador
-    reviews_developer = df_reviews[df_reviews['item_id'].isin(item_ids)]
-
-    # Crear una nueva columna 'sentiment' que clasifique las reseñas como 'Positive' o 'Negative'
-    reviews_developer['sentiment'] = reviews_developer['sentiment_analysis'].apply(lambda x: 'Positive' if x >= 2 else 'Negative')
-
-    # Agrupar por 'sentiment' y contar el número de registros en cada grupo
-    sentiment_counts = reviews_developer.groupby('sentiment')['sentiment'].count()
-
-    # Crear el resultado en el formato especificado
-    result = {desarrolladora: {'Negative': sentiment_counts.get('Negative', 0), 'Positive': sentiment_counts.get('Positive', 0)}}
-
-    return result
-
-
-@app.get('/sentiment_analysis/{anio}')
+@app.get('/eveloper_reviews_analysis/{desarrolladora}')
 async def developer_reviews_analysis(desarrolladora: str):
     # Hacer un merge entre df_reviews_sa y df_steam usando la columna 'item_id'
     df_merged = pd.merge(df_reviews, df_steam, on='item_id')
