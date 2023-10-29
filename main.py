@@ -233,7 +233,9 @@ async def best_developer_year(anio: int):
 @app.get('/best_developer_year/{anio}')
 def best_developer_year(anio: int):
     year_df = df_steam[df_steam['release_date'].dt.year == anio]
-    best_developers = df_reviews[df_reviews['item_id'].isin(year_df['item_id']) & df_reviews['recommend']].groupby('item_id').size().sort_values(ascending=False).head(3).index
+    best_developers = df_reviews[df_reviews['item_id'].isin(year_df['item_id']) &\
+        df_reviews['recommend'] & df_reviews['sentiment_analysis'] > 0]\
+            .groupby('item_id').size().sort_values(ascending=False).head(3).index
     best_developers = year_df[year_df['item_id'].isin(best_developers)]['developer'].tolist()
     
     return [{"Puesto {}".format(i + 1): developer} for i, developer in enumerate(best_developers)]
