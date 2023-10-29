@@ -162,7 +162,7 @@ async def best_developer_year(anio: int):
     return result
 
 
-@app.get('/eveloper_reviews_analysis/{desarrolladora}')
+@app.get('/developer_reviews_analysis/{desarrolladora}')
 async def developer_reviews_analysis(desarrolladora: str):
     # Hacer un merge entre df_reviews_sa y df_steam usando la columna 'item_id'
     df_merged = pd.merge(df_reviews, df_steam, on='item_id')
