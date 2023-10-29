@@ -20,6 +20,9 @@ async def developer(desarrollador: str):
     # Convertir el nombre del desarrollador proporcionado a minúsculas
     desarrollador_lower = desarrollador.lower()
 
+    # Convertir la columna 'release_date' a tipo datetime
+    df_steam['release_date'] = pd.to_datetime(df_steam['release_date'], errors='coerce')
+
     # Filtrar los dataframes para el desarrollador proporcionado
     # Convertir la columna 'developer' a minúsculas antes de la comparación
     developer_games = df_steam[df_steam['developer'].str.lower() == desarrollador_lower]
@@ -29,13 +32,13 @@ async def developer(desarrollador: str):
         return 'El desarrollador no tiene juegos en la plataforma'
 
     # Obtener los años únicos de los juegos del desarrollador
-    years = developer_games['year'].unique()
+    years = developer_games['release_date'].dt.year.unique()
 
     result = {}
 
     for year in years:
         # Filtrar los juegos del desarrollador para el año especificado
-        developer_games_year = developer_games[developer_games['year'] == year]
+        developer_games_year = developer_games[developer_games['release_date'].dt.year == year]
 
         # Contar la cantidad de items
         item_count = len(developer_games_year)
@@ -47,6 +50,7 @@ async def developer(desarrollador: str):
         result[year] = {'Cantidad de Items': item_count, 'Contenido Free': f'{free_percentage}%'}
 
     return {desarrollador: result}
+
 
 
 @app.get('/userdata/{User_id}')
@@ -82,6 +86,9 @@ async def userdata(User_id: str):
 
 @app.get('/UserForGenre/{genero}')
 async def UserForGenre(genero: str):
+    # Convertir la columna 'release_date' a tipo datetime
+    df_steam_exploded['release_date'] = pd.to_datetime(df_steam_exploded['release_date'], errors='coerce')
+
     # Filtrar juegos del género especificado
     gf = df_steam_exploded[df_steam_exploded['genres'] == genero]
 
@@ -107,16 +114,13 @@ Vuelva a ingresar el género y verifique que sea uno de los siguientes, respetan
 18. Software Training
 19. Audio Production
 20. Photo Editing
-21. Design &amp; Illustration
+21. Design & Illustration
 """
     if gf.empty or genero ==  'Accounting':
         return genero_erroneo
 
     # Realizar un left join para mantener todas las filas de gf y luego eliminar filas con playtime_forever NaN
     m = gf.merge(df_items, on=['item_name'], how='left').dropna(subset=['playtime_forever']).drop_duplicates()
-
-    # Convertir la columna 'release_date' a tipo datetime
-    m['release_date'] = pd.to_datetime(m['release_date'], errors='coerce')
 
     # Agrupar por usuario y calcular el tiempo total de juego por usuario
     user_playtime = m.groupby('user_id')['playtime_forever'].sum()
@@ -134,6 +138,7 @@ Vuelva a ingresar el género y verifique que sea uno de los siguientes, respetan
     horas_por_anio = [{"Año": int(year), "Horas": int(hours)} for year, hours in year_playtime.items()]
 
     return {"Usuario con más horas jugadas para el género " + genero: max_playtime_user, "Horas jugadas por año": horas_por_anio}
+
 
 @app.get('/best_developer_year/{anio}')
 async def best_developer_year(anio: int):
