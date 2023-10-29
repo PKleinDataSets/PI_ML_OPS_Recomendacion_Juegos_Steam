@@ -101,7 +101,14 @@ async def userdata(User_id: str):
 
 
 @app.get('/userdata_2/{User_id}')
-def userdata(user_id: str):
+def userdata_2(user_id: str):
+    
+    if user_id not in df_items['user_id']:
+        return 'El usuario no está en los datos'
+    
+    if user_id not in df_reviews['user_id']:
+        return 'El usuario no realizó recomendaciones' 
+       
     user_items = df_items[df_items['user_id'] == user_id]
     user_reviews = df_reviews[df_reviews['user_id'] == user_id]
 
