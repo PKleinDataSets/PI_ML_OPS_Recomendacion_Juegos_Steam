@@ -4,7 +4,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 app = fastapi.FastAPI()
 
-df_items = pd.read_csv('Datasets/items_reduc.csv', encoding='utf-8', sep='|', on_bad_lines='skip')
+df_items = pd.read_csv('Datasets/items_reduc.csv', encoding='utf-8', sep=',', on_bad_lines='skip')
 df_reviews = pd.read_csv('Datasets/reviews_sa.csv')
 df_steam_exploded = pd.read_csv('Datasets/steam_exploded.csv')
 df_steam= pd.read_csv('Datasets/steam_games.csv')
@@ -183,8 +183,27 @@ async def developer_reviews_analysis(desarrolladora: str):
     return result
 
 
-from sklearn.metrics.pairwise import cosine_similarity
+@app.get('/developer_reviews_analysis/{desarrolladora}')
+async def developer_reviews_analysis(desarrolladora: str):
+    # Hacer un merge entre df_reviews_sa y df_steam usando la columna 'item_id'
+    df_merged = pd.merge(df_reviews, df_steam, on='item_id')
 
+    # Filtrar los juegos desarrollados por la desarrolladora dada
+    df_filtered = df_merged[df_merged['developer'] == desarrolladora]
+
+    # Filtrar las reseñas con análisis de sentimiento positivo o negativo
+    df_filtered = df_filtered[df_filtered['sentiment_analysis'].isin([0, 2])]
+
+    # Contar la cantidad de reseñas negativas y positivas
+    negative_count = df_filtered[df_filtered['sentiment_analysis'] == 0].shape[0]
+    positive_count = df_filtered[df_filtered['sentiment_analysis'] == 2].shape[0]
+
+    # Crear el diccionario de retorno
+    result = {desarrolladora: {'Negative': negative_count, 'Positive': positive_count}}
+
+    return result
+
+from sklearn.metrics.pairwise import cosine_similarity
 
 df_reviews_shuffled = df_reviews.head(10000)
 df_reviews_shuffled = df_reviews_shuffled.sample(frac=1, random_state=42)
