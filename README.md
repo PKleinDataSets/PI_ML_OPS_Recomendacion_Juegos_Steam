@@ -1,4 +1,4 @@
-# PI_ML_OPS_Steam2
+# PI_ML_OPS_Recomendacion_Juegos_Steam
 
 # <h1 align=center> **Proyecto Individual MLOps** </h1>
 # <h1 align=center>**`Machine Learning Operations (MLOps)`**</h1>
@@ -44,6 +44,9 @@ Nuestros objetivos principales son la generación de una API (Application Progra
 5. Funciones_API.ipynb :
         En contiene las funciones de la API con pruebas de distintos inputs , explicaciones y mas comentarios sobre el codigo     
 
+6. prueba.ipynb :
+        Contiene pruebas de las funciones de la API con explicaciones del modelo de Machine Learning usado para la recomendacion
+
 :heavy_check_mark: Carpeta Datasets: Esta carpeta contiene los datasets necesarios para correr
 la API , que habian sido exportados ya el proceso de ETL 
              
@@ -66,7 +69,7 @@ Positivas.
 Para finalizar construiremos una API que contiene consultas sobre los datos y un sistema de 
 recomendación user-item de juegos de Steam
 
-En este link encontraras las tranformaciones realizadas y el EDA  el cual fue realizado en la nube (Google Colab): [ETL_EDA](https://github.com/PKleinDataSets/PI_ML_OPS_Steam2/tree/main/ETL_EDA_Feature_Eng)
+En este link encontraras las tranformaciones realizadas y el EDA  el cual fue realizado en la nube (Google Colab): [ETL_EDA](https://github.com/PKleinDataSets/PI_ML_OPS_Recomendacion_Juegos_Steam/tree/main/ETL_EDA_Feature_Eng)
 
 # **Desarrollo de nuestra API**
 
